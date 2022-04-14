@@ -17,7 +17,7 @@ go test -bench QuickVerifier
 
 Requires [`docker`](https://www.docker.com)
 
-Build and run
+Build and run `docker` container. 
 ```
 cd ev && bash build.sh && bash run.sh
 ```
