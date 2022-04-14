@@ -4,7 +4,7 @@ Code for _Public Verification for Private Hash Matching: Challenges, Policy Resp
 
 Generate dummy data
 ```
-mkdir data && python3 generate_data.py <N> <tau> <|X|> ./data
+cd bv && mkdir data && python3 generate_data.py <N> <tau> <|X|> ./data
 ```
 
 Run benchmarks
@@ -32,6 +32,6 @@ cd emp/emp-ag2pc
 
 Run benchmarks
 ```
-go test -bench NM
+cd nm && go test -bench NM
 ```
 

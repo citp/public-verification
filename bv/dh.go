@@ -1,4 +1,4 @@
-package main
+package bv
 
 import (
 	"crypto/elliptic"
@@ -16,8 +16,8 @@ type DHContext struct {
 
 type DHScalar *big.Int
 type DHElement struct {
-	x *big.Int
-	y *big.Int
+	X *big.Int
+	Y *big.Int
 }
 
 // -----------------------------------------------------------------------------
@@ -53,19 +53,19 @@ func NewDHElement() DHElement {
 
 func (ctx *DHContext) EC_BaseMultiply(s DHScalar) DHElement {
 	var ret DHElement
-	ret.x, ret.y = ctx.Curve.ScalarBaseMult((*s).Bytes())
+	ret.X, ret.Y = ctx.Curve.ScalarBaseMult((*s).Bytes())
 	return ret
 }
 
 func (ctx *DHContext) EC_Multiply(s DHScalar, p DHElement) DHElement {
 	var ret DHElement
-	ret.x, ret.y = ctx.Curve.ScalarMult(p.x, p.y, (*s).Bytes())
+	ret.X, ret.Y = ctx.Curve.ScalarMult(p.X, p.Y, (*s).Bytes())
 	return ret
 }
 
 func (ctx *DHContext) EC_Add(a, b DHElement) DHElement {
 	var ret DHElement
-	ret.x, ret.y = ctx.Curve.Add(a.x, a.y, b.x, b.y)
+	ret.X, ret.Y = ctx.Curve.Add(a.X, a.Y, b.X, b.Y)
 	return ret
 }
 
@@ -170,7 +170,7 @@ func (ctx *DHContext) HashToCurve(s string) DHElement {
 // -----------------------------------------------------------------------------
 
 func (p *DHElement) String() string {
-	return p.x.Text(16) + "," + p.y.Text(16)
+	return p.X.Text(16) + "," + p.Y.Text(16)
 }
 
 func BigIntFrom(s string) *big.Int {

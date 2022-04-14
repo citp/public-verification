@@ -1,7 +1,9 @@
-package main
+package nm
 
 import (
 	"math/big"
+
+	"github.com/citp/pvphm/bv"
 )
 
 type NM_Context struct {
@@ -13,9 +15,9 @@ type NM_Context struct {
 type NM_Prover struct {
 	alpha     *big.Int
 	x         string
-	Hx        DHElement
-	H1        DHElement
-	H2        DHElement
+	Hx        bv.DHElement
+	H1        bv.DHElement
+	H2        bv.DHElement
 	r         *big.Int
 	s         *big.Int
 	t         *big.Int
@@ -27,18 +29,18 @@ type NM_Prover struct {
 
 type NM_Verifier struct {
 	x  string
-	Hx DHElement
-	H1 DHElement
-	H2 DHElement
+	Hx bv.DHElement
+	H1 bv.DHElement
+	H2 bv.DHElement
 }
 
 type NM_MSG_1P struct {
-	L         DHElement
-	P1        DHElement
-	P2        DHElement
-	R         DHElement
-	S         DHElement
-	T         DHElement
+	L         bv.DHElement
+	P1        bv.DHElement
+	P2        bv.DHElement
+	R         bv.DHElement
+	S         bv.DHElement
+	T         bv.DHElement
 	com_alpha PC_Commitment
 	com_r     PC_Commitment
 	com_s     PC_Commitment
@@ -69,7 +71,7 @@ func NewNM_Context(nRepeat, mode int) NM_Context {
 	return NM_Context{nRepeat, mode, NewPC_Context()}
 }
 
-func (p *NM_Prover) Init(ctx *NM_Context, x string, H1, H2 DHElement) {
+func (p *NM_Prover) Init(ctx *NM_Context, x string, H1, H2 bv.DHElement) {
 	p.alpha = ctx.pc.PC_RandomScalar()
 	p.H1 = H1
 	p.H2 = H2
@@ -125,7 +127,7 @@ func (p *NM_Prover) Two(ctx *NM_Context, msg NM_MSG_1V) (*NM_MSG_2P_0, *NM_MSG_2
 
 // -----------------------------------------------------------------------------
 
-func (v *NM_Verifier) Init(ctx *NM_Context, x string, H1, H2 DHElement) {
+func (v *NM_Verifier) Init(ctx *NM_Context, x string, H1, H2 bv.DHElement) {
 	v.H1 = H1
 	v.H2 = H2
 	v.x = x
@@ -134,9 +136,9 @@ func (v *NM_Verifier) Init(ctx *NM_Context, x string, H1, H2 DHElement) {
 
 func (v *NM_Verifier) One(ctx *NM_Context) NM_MSG_1V {
 	// defer timer(time.Now(), "VR1")
-	coin := RandomScalar(big.NewInt(int64(2))).Int64()
+	coin := bv.RandomScalar(big.NewInt(int64(2))).Int64()
 	if coin == 1 {
-		coin += RandomScalar(big.NewInt(int64(3))).Int64()
+		coin += bv.RandomScalar(big.NewInt(int64(3))).Int64()
 	}
 
 	return NM_MSG_1V{coin}
@@ -151,16 +153,16 @@ func (v *NM_Verifier) Two(ctx *NM_Context, msgV NM_MSG_1V, msg1P NM_MSG_1P, msg2
 	switch msgV.coin {
 	case 0:
 		msg := msg2P.(NM_MSG_2P_0)
-		Assert(ctx.pc.PC_Decommit(msg.r, msg.rnd_r, msg1P.com_r))
-		Assert(ctx.pc.PC_Decommit(msg.s, msg.rnd_s, msg1P.com_s))
-		Assert(ctx.pc.PC_Decommit(msg.t, msg.rnd_t, msg1P.com_t))
+		bv.Assert(ctx.pc.PC_Decommit(msg.r, msg.rnd_r, msg1P.com_r))
+		bv.Assert(ctx.pc.PC_Decommit(msg.s, msg.rnd_s, msg1P.com_s))
+		bv.Assert(ctx.pc.PC_Decommit(msg.t, msg.rnd_t, msg1P.com_t))
 
 		lhs_R := ctx.pc.ctxDH.EC_BaseMultiply(msg.r)
 		lhs_S := ctx.pc.ctxDH.EC_Multiply(msg.s, H_x)
 		lhs_T := ctx.pc.ctxDH.EC_Multiply(msg.t, H_x)
-		Assert(msg1P.R.x.Cmp(lhs_R.x) == 0 && msg1P.R.y.Cmp(lhs_R.y) == 0)
-		Assert(msg1P.S.x.Cmp(lhs_S.x) == 0 && msg1P.S.y.Cmp(lhs_S.y) == 0)
-		Assert(msg1P.T.x.Cmp(lhs_T.x) == 0 && msg1P.T.y.Cmp(lhs_T.y) == 0)
+		bv.Assert(msg1P.R.X.Cmp(lhs_R.X) == 0 && msg1P.R.Y.Cmp(lhs_R.Y) == 0)
+		bv.Assert(msg1P.S.X.Cmp(lhs_S.X) == 0 && msg1P.S.Y.Cmp(lhs_S.Y) == 0)
+		bv.Assert(msg1P.T.X.Cmp(lhs_T.X) == 0 && msg1P.T.Y.Cmp(lhs_T.Y) == 0)
 		return true
 	default:
 		msg := msg2P.(NM_MSG_2P_Not0)
@@ -171,22 +173,22 @@ func (v *NM_Verifier) Two(ctx *NM_Context, msgV NM_MSG_1V, msg1P NM_MSG_1P, msg2
 	switch msgV.coin {
 	case 1:
 		com_ar := ctx.pc.PC_Add(msg1P.com_alpha, msg1P.com_r)
-		Assert(ctx.pc.PC_Decommit(aPrime, rnd_aPrime, com_ar))
+		bv.Assert(ctx.pc.PC_Decommit(aPrime, rnd_aPrime, com_ar))
 		lhs := ctx.pc.ctxDH.EC_BaseMultiply(aPrime)
 		rhs := ctx.pc.ctxDH.EC_Add(msg1P.L, msg1P.R)
-		Assert(lhs.x.Cmp(rhs.x) == 0 && lhs.y.Cmp(rhs.y) == 0)
+		bv.Assert(lhs.X.Cmp(rhs.X) == 0 && lhs.Y.Cmp(rhs.Y) == 0)
 	case 2:
 		com_as := ctx.pc.PC_Add(msg1P.com_alpha, msg1P.com_s)
-		Assert(ctx.pc.PC_Decommit(aPrime, rnd_aPrime, com_as))
+		bv.Assert(ctx.pc.PC_Decommit(aPrime, rnd_aPrime, com_as))
 		lhs := ctx.pc.ctxDH.EC_Multiply(aPrime, H_x)
 		rhs := ctx.pc.ctxDH.EC_Add(msg1P.P1, msg1P.S)
-		Assert(lhs.x.Cmp(rhs.x) != 0 || lhs.y.Cmp(rhs.y) != 0)
+		bv.Assert(lhs.X.Cmp(rhs.X) != 0 || lhs.Y.Cmp(rhs.Y) != 0)
 	case 3:
 		com_at := ctx.pc.PC_Add(msg1P.com_alpha, msg1P.com_t)
-		Assert(ctx.pc.PC_Decommit(aPrime, rnd_aPrime, com_at))
+		bv.Assert(ctx.pc.PC_Decommit(aPrime, rnd_aPrime, com_at))
 		lhs := ctx.pc.ctxDH.EC_Multiply(aPrime, H_x)
 		rhs := ctx.pc.ctxDH.EC_Add(msg1P.P2, msg1P.T)
-		Assert(lhs.x.Cmp(rhs.x) != 0 || lhs.y.Cmp(rhs.y) != 0)
+		bv.Assert(lhs.X.Cmp(rhs.X) != 0 || lhs.Y.Cmp(rhs.Y) != 0)
 	}
 
 	return true
