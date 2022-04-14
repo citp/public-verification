@@ -15,12 +15,14 @@ go test -bench QuickVerifier
 
 # Guaranteed Eventual Detection Notification
 
+Requires [`docker`](https://www.docker.com)
+
 Build and run
 ```
 cd ev && bash build.sh && bash run.sh
 ```
 
-Then switch directories (in the Docker container) and run benchmarks
+Then switch directories (in the `docker` container) and run benchmarks
 ```
 cd emp/emp-ag2pc
 ./run ./bin/test_benchmark 12345
