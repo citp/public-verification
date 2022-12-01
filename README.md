@@ -30,8 +30,12 @@ cd emp/emp-ag2pc
 
 # Proof of Non-Membership in the Hash Set
 
-Run benchmarks
+Run benchmarks (both interactive and non-interactive proofs) 
 ```
 go test -bench NM
 ```
 
+Run benchmarks (only non-interactive proof) 
+```
+go test -bench NMFS
+```
