@@ -4,7 +4,7 @@ Code for _Public Verification for Private Hash Matching: Challenges, Policy Resp
 
 Generate dummy data
 ```
-mkdir data && python3 generate_data.py <N> <tau> <|X|> ./data
+cd bv && mkdir data && python3 generate_data.py <N> <tau> <|X|> ./data
 ```
 
 Run benchmarks
@@ -17,7 +17,7 @@ go test -bench QuickVerifier
 
 Requires [`docker`](https://www.docker.com)
 
-Build and run
+Build and run `docker` container. 
 ```
 cd ev && bash build.sh && bash run.sh
 ```
@@ -32,10 +32,10 @@ cd emp/emp-ag2pc
 
 Run benchmarks (both interactive and non-interactive proofs) 
 ```
-go test -bench NM
+cd nm && go test -bench NM
 ```
 
 Run benchmarks (only non-interactive proof) 
 ```
-go test -bench NMFS
+gcd nm && go test -bench NMFS
 ```

@@ -1,8 +1,10 @@
-package main
+package nm
 
 import (
 	"crypto/sha512"
 	"math/big"
+
+	"github.com/citp/pvphm/bv"
 )
 
 type NMFS_Prover_Rounds struct {
@@ -18,33 +20,33 @@ type NMFS_Prover_Rounds struct {
 type NMFS_Prover struct {
 	alpha  *big.Int
 	x      string
-	Hx     DHElement
-	H1     DHElement
-	H2     DHElement
+	Hx     bv.DHElement
+	H1     bv.DHElement
+	H2     bv.DHElement
 	Rounds []NMFS_Prover_Rounds
 }
 
 type NMFS_MSG_P_Rounds struct {
-	R         DHElement
-	S         DHElement
-	T         DHElement
-	com_alpha PC_Commitment
-	com_r     PC_Commitment
-	com_s     PC_Commitment
-	com_t     PC_Commitment
+	R         bv.DHElement
+	S         bv.DHElement
+	T         bv.DHElement
+	com_alpha bv.PC_Commitment
+	com_r     bv.PC_Commitment
+	com_s     bv.PC_Commitment
+	com_t     bv.PC_Commitment
 	Response  interface{}
 }
 
 type NMFS_MSG_P struct {
-	L      DHElement
-	P1     DHElement
-	P2     DHElement
+	L      bv.DHElement
+	P1     bv.DHElement
+	P2     bv.DHElement
 	Rounds []NMFS_MSG_P_Rounds
 }
 
 // -----------------------------------------------------------------------------
 
-func (p *NMFS_Prover) Init(ctx *NM_Context, x string, H1, H2 DHElement) {
+func (p *NMFS_Prover) Init(ctx *bv.NM_Context, x string, H1, H2 bv.DHElement) {
 	p.alpha = ctx.pc.PC_RandomScalar()
 	p.H1 = H1
 	p.H2 = H2
