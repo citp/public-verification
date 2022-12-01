@@ -6,7 +6,6 @@ import (
 
 type NM_Context struct {
 	nRepeat int
-	mode    int
 	pc      PC_Context
 }
 
@@ -65,8 +64,8 @@ type NM_MSG_2P_Not0 struct {
 
 // -----------------------------------------------------------------------------
 
-func NewNM_Context(nRepeat, mode int) NM_Context {
-	return NM_Context{nRepeat, mode, NewPC_Context()}
+func NewNM_Context(nRepeat int) NM_Context {
+	return NM_Context{nRepeat, NewPC_Context()}
 }
 
 func (p *NM_Prover) Init(ctx *NM_Context, x string, H1, H2 DHElement) {
