@@ -30,10 +30,10 @@ type NMFS_MSG_P_Rounds struct {
 	R         bv.DHElement
 	S         bv.DHElement
 	T         bv.DHElement
-	com_alpha bv.PC_Commitment
-	com_r     bv.PC_Commitment
-	com_s     bv.PC_Commitment
-	com_t     bv.PC_Commitment
+	com_alpha PC_Commitment
+	com_r     PC_Commitment
+	com_s     PC_Commitment
+	com_t     PC_Commitment
 	Response  interface{}
 }
 
@@ -46,7 +46,7 @@ type NMFS_MSG_P struct {
 
 // -----------------------------------------------------------------------------
 
-func (p *NMFS_Prover) Init(ctx *bv.NM_Context, x string, H1, H2 bv.DHElement) {
+func (p *NMFS_Prover) Init(ctx *NM_Context, x string, H1, H2 bv.DHElement) {
 	p.alpha = ctx.pc.PC_RandomScalar()
 	p.H1 = H1
 	p.H2 = H2
@@ -140,7 +140,7 @@ func FSHash(payload string, rounds int) []uint8 {
 
 	// Parse into round challenges
 	c := append(ParseIntoChallenge(o1[:]), ParseIntoChallenge(o2[:])...)
-	Assert(rounds < len(c))
+	bv.Assert(rounds < len(c))
 	return c[:rounds]
 }
 
@@ -166,16 +166,16 @@ func (v *NM_Verifier) FiatShamir(ctx *NM_Context, msgP NMFS_MSG_P) bool {
 		switch c[i] {
 		case 0:
 			msg := msgP.Rounds[i].Response.(NM_MSG_2P_0)
-			Assert(ctx.pc.PC_Decommit(msg.r, msg.rnd_r, msgP.Rounds[i].com_r))
-			Assert(ctx.pc.PC_Decommit(msg.s, msg.rnd_s, msgP.Rounds[i].com_s))
-			Assert(ctx.pc.PC_Decommit(msg.t, msg.rnd_t, msgP.Rounds[i].com_t))
+			bv.Assert(ctx.pc.PC_Decommit(msg.r, msg.rnd_r, msgP.Rounds[i].com_r))
+			bv.Assert(ctx.pc.PC_Decommit(msg.s, msg.rnd_s, msgP.Rounds[i].com_s))
+			bv.Assert(ctx.pc.PC_Decommit(msg.t, msg.rnd_t, msgP.Rounds[i].com_t))
 
 			lhs_R := ctx.pc.ctxDH.EC_BaseMultiply(msg.r)
 			lhs_S := ctx.pc.ctxDH.EC_Multiply(msg.s, H_x)
 			lhs_T := ctx.pc.ctxDH.EC_Multiply(msg.t, H_x)
-			Assert(msgP.Rounds[i].R.x.Cmp(lhs_R.x) == 0 && msgP.Rounds[i].R.y.Cmp(lhs_R.y) == 0)
-			Assert(msgP.Rounds[i].S.x.Cmp(lhs_S.x) == 0 && msgP.Rounds[i].S.y.Cmp(lhs_S.y) == 0)
-			Assert(msgP.Rounds[i].T.x.Cmp(lhs_T.x) == 0 && msgP.Rounds[i].T.y.Cmp(lhs_T.y) == 0)
+			bv.Assert(msgP.Rounds[i].R.X.Cmp(lhs_R.X) == 0 && msgP.Rounds[i].R.Y.Cmp(lhs_R.Y) == 0)
+			bv.Assert(msgP.Rounds[i].S.X.Cmp(lhs_S.X) == 0 && msgP.Rounds[i].S.Y.Cmp(lhs_S.Y) == 0)
+			bv.Assert(msgP.Rounds[i].T.X.Cmp(lhs_T.X) == 0 && msgP.Rounds[i].T.Y.Cmp(lhs_T.Y) == 0)
 			break
 		default:
 			msg := msgP.Rounds[i].Response.(NM_MSG_2P_Not0)
@@ -185,24 +185,24 @@ func (v *NM_Verifier) FiatShamir(ctx *NM_Context, msgP NMFS_MSG_P) bool {
 		switch c[i] {
 		case 1:
 			com_ar := ctx.pc.PC_Add(msgP.Rounds[i].com_alpha, msgP.Rounds[i].com_r)
-			Assert(ctx.pc.PC_Decommit(aPrime, rnd_aPrime, com_ar))
+			bv.Assert(ctx.pc.PC_Decommit(aPrime, rnd_aPrime, com_ar))
 			lhs := ctx.pc.ctxDH.EC_BaseMultiply(aPrime)
 			rhs := ctx.pc.ctxDH.EC_Add(msgP.L, msgP.Rounds[i].R)
-			Assert(lhs.x.Cmp(rhs.x) == 0 && lhs.y.Cmp(rhs.y) == 0)
+			bv.Assert(lhs.X.Cmp(rhs.X) == 0 && lhs.Y.Cmp(rhs.Y) == 0)
 			break
 		case 2:
 			com_as := ctx.pc.PC_Add(msgP.Rounds[i].com_alpha, msgP.Rounds[i].com_s)
-			Assert(ctx.pc.PC_Decommit(aPrime, rnd_aPrime, com_as))
+			bv.Assert(ctx.pc.PC_Decommit(aPrime, rnd_aPrime, com_as))
 			lhs := ctx.pc.ctxDH.EC_Multiply(aPrime, H_x)
 			rhs := ctx.pc.ctxDH.EC_Add(msgP.P1, msgP.Rounds[i].S)
-			Assert(lhs.x.Cmp(rhs.x) != 0 || lhs.y.Cmp(rhs.y) != 0)
+			bv.Assert(lhs.X.Cmp(rhs.X) != 0 || lhs.Y.Cmp(rhs.Y) != 0)
 			break
 		case 3:
 			com_at := ctx.pc.PC_Add(msgP.Rounds[i].com_alpha, msgP.Rounds[i].com_t)
-			Assert(ctx.pc.PC_Decommit(aPrime, rnd_aPrime, com_at))
+			bv.Assert(ctx.pc.PC_Decommit(aPrime, rnd_aPrime, com_at))
 			lhs := ctx.pc.ctxDH.EC_Multiply(aPrime, H_x)
 			rhs := ctx.pc.ctxDH.EC_Add(msgP.P2, msgP.Rounds[i].T)
-			Assert(lhs.x.Cmp(rhs.x) != 0 || lhs.y.Cmp(rhs.y) != 0)
+			bv.Assert(lhs.X.Cmp(rhs.X) != 0 || lhs.Y.Cmp(rhs.Y) != 0)
 			break
 		}
 	}

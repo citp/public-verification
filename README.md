@@ -37,5 +37,5 @@ cd nm && go test -bench NM
 
 Run benchmarks (only non-interactive proof) 
 ```
-gcd nm && go test -bench NMFS
+cd nm && go test -bench NMFS
 ```

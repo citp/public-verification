@@ -8,7 +8,7 @@ import (
 
 type NM_Context struct {
 	nRepeat int
-	pc      bv.PC_Context
+	pc      PC_Context
 }
 
 type NM_Prover struct {
@@ -40,10 +40,10 @@ type NM_MSG_1P struct {
 	R         bv.DHElement
 	S         bv.DHElement
 	T         bv.DHElement
-	com_alpha bv.PC_Commitment
-	com_r     bv.PC_Commitment
-	com_s     bv.PC_Commitment
-	com_t     bv.PC_Commitment
+	com_alpha PC_Commitment
+	com_r     PC_Commitment
+	com_s     PC_Commitment
+	com_t     PC_Commitment
 }
 
 type NM_MSG_1V struct {
@@ -67,7 +67,7 @@ type NM_MSG_2P_Not0 struct {
 // -----------------------------------------------------------------------------
 
 func NewNM_Context(nRepeat int) NM_Context {
-	return NM_Context{nRepeat, bv.NewPC_Context()}
+	return NM_Context{nRepeat, NewPC_Context()}
 }
 
 func (p *NM_Prover) Init(ctx *NM_Context, x string, H1, H2 bv.DHElement) {
@@ -84,7 +84,7 @@ func (p *NM_Prover) One(ctx *NM_Context) NM_MSG_1P {
 	p.s = ctx.pc.PC_RandomScalar()
 	p.t = ctx.pc.PC_RandomScalar()
 
-	var com_alpha, com_r, com_s, com_t bv.PC_Commitment
+	var com_alpha, com_r, com_s, com_t PC_Commitment
 
 	p.rnd_alpha, com_alpha = ctx.pc.PC_Commit(p.alpha)
 	p.rnd_r, com_r = ctx.pc.PC_Commit(p.r)

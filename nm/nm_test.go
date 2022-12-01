@@ -1,9 +1,8 @@
 package nm
 
 import (
-	"testing"
-
 	"github.com/citp/pvphm/bv"
+	"testing"
 )
 
 // For 128 bit security, need log_2(6) * 128 ~ 331 iterations
@@ -32,9 +31,9 @@ func BenchmarkNM(bench *testing.B) {
 // #############################################################################
 
 func HelperNMInit(bench *testing.B, ctx *NM_Context, p *NM_Prover, v *NM_Verifier) {
-	x := string(RandomBytes(NM_STRING_LEN))
-	H1 := ctx.pc.ctxDH.HashToCurve(string(RandomBytes(NM_STRING_LEN)))
-	H2 := ctx.pc.ctxDH.HashToCurve(string(RandomBytes(NM_STRING_LEN)))
+	x := string(bv.RandomBytes(NM_STRING_LEN))
+	H1 := ctx.pc.ctxDH.HashToCurve(string(bv.RandomBytes(NM_STRING_LEN)))
+	H2 := ctx.pc.ctxDH.HashToCurve(string(bv.RandomBytes(NM_STRING_LEN)))
 
 	bench.Run("Prove", func(b *testing.B) {
 		p.Init(ctx, x, H1, H2)
@@ -66,9 +65,9 @@ func HelperNMInner(bench *testing.B, ctx *NM_Context, p *NM_Prover, v *NM_Verifi
 // #############################################################################
 
 func HelperNMFSInit(bench *testing.B, ctx *NM_Context, p *NMFS_Prover, v *NM_Verifier) {
-	x := string(RandomBytes(NM_STRING_LEN))
-	H1 := ctx.pc.ctxDH.HashToCurve(string(RandomBytes(NM_STRING_LEN)))
-	H2 := ctx.pc.ctxDH.HashToCurve(string(RandomBytes(NM_STRING_LEN)))
+	x := string(bv.RandomBytes(NM_STRING_LEN))
+	H1 := ctx.pc.ctxDH.HashToCurve(string(bv.RandomBytes(NM_STRING_LEN)))
+	H2 := ctx.pc.ctxDH.HashToCurve(string(bv.RandomBytes(NM_STRING_LEN)))
 
 	bench.Run("Prove", func(b *testing.B) {
 		p.Init(ctx, x, H1, H2)
@@ -97,7 +96,7 @@ func BenchmarkNMFS(bench *testing.B) {
 		})
 
 		bench.Run("NIZK Proof Ver", func(b *testing.B) {
-			Assert(verifier.FiatShamir(&ctx, msg))
+			bv.Assert(verifier.FiatShamir(&ctx, msg))
 		})
 	}
 
