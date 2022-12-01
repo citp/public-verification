@@ -1,4 +1,4 @@
-Code for _Public Verification for Private Hash Matching: Challenges, Policy Responses, and Protocols_
+Code for _Public Verification for Private Hash Matching_
 
 # Proof of External Approval of the Hash Set
 
